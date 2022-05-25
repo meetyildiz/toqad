@@ -32,7 +32,7 @@ _CITATION = """
 _DESCRIPTION = """\
 """
 
-_URL = "./"
+_URL = "https://raw.githubusercontent.com/meetyildiz/toqad/main/"
 _URLS = {
     "train": _URL + "train.json",
     "dev": _URL + "dev.json",
