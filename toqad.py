@@ -26,33 +26,17 @@ from datasets.tasks import QuestionAnsweringExtractive
 logger = datasets.logging.get_logger(__name__)
 
 
-_CITATION = """\
-@article{2016arXiv160605250R,
-       author = {{Rajpurkar}, Pranav and {Zhang}, Jian and {Lopyrev},
-                 Konstantin and {Liang}, Percy},
-        title = "{SQuAD: 100,000+ Questions for Machine Comprehension of Text}",
-      journal = {arXiv e-prints},
-         year = 2016,
-          eid = {arXiv:1606.05250},
-        pages = {arXiv:1606.05250},
-archivePrefix = {arXiv},
-       eprint = {1606.05250},
-}
+_CITATION = """
 """
 
 _DESCRIPTION = """\
-Stanford Question Answering Dataset (SQuAD) is a reading comprehension \
-dataset, consisting of questions posed by crowdworkers on a set of Wikipedia \
-articles, where the answer to every question is a segment of text, or span, \
-from the corresponding reading passage, or the question might be unanswerable.
 """
 
-_URL = "https://rajpurkar.github.io/SQuAD-explorer/dataset/"
+_URL = "./"
 _URLS = {
     "train": _URL + "train.json",
     "dev": _URL + "dev.json",
 }
-
 
 class SquadConfig(datasets.BuilderConfig):
     """BuilderConfig for SQUAD."""
@@ -119,23 +103,29 @@ class Squad(datasets.GeneratorBasedBuilder):
         key = 0
         with open(filepath, encoding="utf-8") as f:
             squad = json.load(f)
-            for article in squad["data"]:
-                title = article.get("title", "")
-                for paragraph in article["paragraphs"]:
-                    context = paragraph["context"]  # do not strip leading blank spaces GH-2585
-                    for qa in paragraph["qas"]:
-                        answer_starts = [answer["answer_start"] for answer in qa["answers"]]
-                        answers = [answer["text"] for answer in qa["answers"]]
-                        # Features currently used are "context", "question", and "answers".
-                        # Others are extracted here for the ease of future expansions.
-                        yield key, {
-                            "title": title,
-                            "context": context,
-                            "question": qa["question"],
-                            "id": qa["id"],
+            
+            for document in squad["data"]: 
+                for par in document['paragraphs']:
+                    for qas in par['qas']:
+                        if len(qas['answers']) == 0: #no answer
+                            ans_start = -1
+                            ans_end = -1
+                            ans_text = ""
+                        else:
+                            ans_start = int(qas['answers'][0]['answer_start'])
+                            ans_end = ans_start + len(qas['answers'][0]['text'])
+                            ans_text = qas['answers'][0]['text']
+
+                        ex = {
+                            "id": qas["id"],
+                            "title": document["title"],
+                            "context": par['context'],
+                            "question": qas['question'],
                             "answers": {
-                                "answer_start": answer_starts,
-                                "text": answers,
+                                "text": [ans_text],
+                                "answer_start": [ans_start],
                             },
                         }
+
+                        yield key, ex
                         key += 1
