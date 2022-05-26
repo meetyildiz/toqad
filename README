@@ -1,0 +1,12 @@
+# ToQAD
+
+Turkish Question Answering Datasets
+
+## Base
+https://huggingface.co/datasets/meetyildiz/toqad
+
+## Large
+https://huggingface.co/datasets/meetyildiz/toqad-large
+
+## Augmented
+https://huggingface.co/datasets/meetyildiz/toqad-augmented
